@@ -77,8 +77,3 @@ RecipeHub/
         ├── utils/                 # localStorage helpers
         └── constants.js
 ```
-
-### Adding a new backend feature
-1. Write the handler in `controllers/xxx.controller.js`
-2. Register the URL in `routes/xxx.routes.js`
-3. Mount the router in `routes/index.js`
