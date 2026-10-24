@@ -1,38 +1,46 @@
-export default function RecipeForm({ form, onChange, onSubmit, busy }) {
+import { btnPrimary, fieldLabel, input } from '../styles.js';
+
+// Used by both "Share a recipe" (POST) and "Edit recipe" (PATCH).
+export default function RecipeForm({
+  form, onChange, onSubmit, busy, submitLabel = 'Publish recipe',
+}) {
   const set = (key) => (event) => onChange({ ...form, [key]: event.target.value });
+  const field = `${input} mt-1.5`;
 
   return (
-    <form onSubmit={onSubmit} className="recipe-form">
-      <label>
+    <form onSubmit={onSubmit} className="max-w-[760px]">
+      <label className={fieldLabel}>
         Dish name *
-        <input required value={form.dish} onChange={set('dish')} />
+        <input className={field} required value={form.dish} onChange={set('dish')} />
       </label>
 
-      <label>
+      <label className={fieldLabel}>
         Recipe title
-        <input value={form.title} onChange={set('title')} placeholder="Optional" />
+        <input className={field} value={form.title} onChange={set('title')} placeholder="Optional" />
       </label>
 
-      <label>
+      <label className={fieldLabel}>
         Image URL
-        <input value={form.img} onChange={set('img')} placeholder="https://..." />
+        <input className={field} value={form.img} onChange={set('img')} placeholder="https://..." />
       </label>
 
-      <div className="two">
-        <label>
+      {/* 1 column on phones, 2 columns from sm (640px) upwards */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label className={fieldLabel}>
           Prep time (minutes)
-          <input type="number" min="1" value={form.time} onChange={set('time')} />
+          <input className={field} type="number" min="1" value={form.time} onChange={set('time')} />
         </label>
 
-        <label>
+        <label className={fieldLabel}>
           Servings
-          <input type="number" min="1" value={form.servings} onChange={set('servings')} />
+          <input className={field} type="number" min="1" value={form.servings} onChange={set('servings')} />
         </label>
       </div>
 
-      <label>
+      <label className={fieldLabel}>
         Ingredients *
         <textarea
+          className={field}
           required
           rows="5"
           value={form.ing}
@@ -41,9 +49,10 @@ export default function RecipeForm({ form, onChange, onSubmit, busy }) {
         />
       </label>
 
-      <label>
+      <label className={fieldLabel}>
         Steps *
         <textarea
+          className={field}
           required
           rows="5"
           value={form.steps}
@@ -52,8 +61,8 @@ export default function RecipeForm({ form, onChange, onSubmit, busy }) {
         />
       </label>
 
-      <button className="primary" disabled={busy}>
-        Publish recipe
+      <button className={`${btnPrimary} w-full sm:w-auto`} disabled={busy}>
+        {submitLabel}
       </button>
     </form>
   );

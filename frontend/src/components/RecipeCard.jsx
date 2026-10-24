@@ -1,14 +1,17 @@
+import { Link } from 'react-router-dom';
 import { PLACEHOLDER_IMG } from '../constants.js';
+import { eyebrow, muted } from '../styles.js';
 
 // One card used for community dishes, online recipes and saved items.
-export default function RecipeCard({ recipe, onClick }) {
+// `to` is the URL the card links to.
+export default function RecipeCard({ recipe, to }) {
   const online = recipe.rid?.startsWith('s_');
 
-  let eyebrow = 'COMMUNITY RECIPE';
+  let label = 'COMMUNITY RECIPE';
   if (online) {
-    eyebrow = 'ONLINE RECIPE';
+    label = 'ONLINE RECIPE';
   } else if (recipe.versions) {
-    eyebrow = `${recipe.versions} community version${recipe.versions === 1 ? '' : 's'}`;
+    label = `${recipe.versions} community version${recipe.versions === 1 ? '' : 's'}`;
   }
 
   let subtitle;
@@ -21,8 +24,12 @@ export default function RecipeCard({ recipe, onClick }) {
   }
 
   return (
-    <article className="recipe-card" onClick={onClick}>
+    <Link
+      to={to}
+      className="block overflow-hidden rounded-[17px] border border-line bg-white transition duration-150 hover:-translate-y-[3px] hover:shadow-[0_12px_30px_#573a2012]"
+    >
       <img
+        className="block h-[175px] w-full bg-[#f1e7dc] object-cover"
         src={recipe.img || PLACEHOLDER_IMG}
         alt={recipe.name || recipe.title || 'Recipe'}
         onError={(event) => {
@@ -31,11 +38,13 @@ export default function RecipeCard({ recipe, onClick }) {
         }}
       />
 
-      <div className="card-body">
-        <div className="eyebrow">{eyebrow}</div>
-        <h3>{recipe.name || recipe.title || recipe.dish}</h3>
-        <p className="muted">{subtitle}</p>
+      <div className="p-4">
+        <div className={eyebrow}>{label}</div>
+        <h3 className="mt-0 mb-2 font-serif text-[1.2rem] font-bold">
+          {recipe.name || recipe.title || recipe.dish}
+        </h3>
+        <p className={`${muted} mb-0`}>{subtitle}</p>
       </div>
-    </article>
+    </Link>
   );
 }

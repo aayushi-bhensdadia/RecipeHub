@@ -1,7 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { createRecipe } from '../api/recipes.js';
 import RecipeForm from '../components/RecipeForm.jsx';
 import { useApp } from '../context/AppContext.jsx';
+import { paths } from '../routes.js';
+import { eyebrow, muted, pageTitle, panel } from '../styles.js';
 
 const EMPTY_FORM = {
   dish: '',
@@ -14,7 +17,8 @@ const EMPTY_FORM = {
 };
 
 export default function AddRecipePage() {
-  const { say, busy, withBusy, openDish } = useApp();
+  const { say, busy, withBusy } = useApp();
+  const navigate = useNavigate();
   const [form, setForm] = useState(EMPTY_FORM);
 
   const handleSubmit = async (event) => {
@@ -32,7 +36,7 @@ export default function AddRecipePage() {
 
         say('Recipe shared!');
         setForm(EMPTY_FORM);
-        openDish(data.dishKey);
+        navigate(paths.dish(data.dishKey));
       } catch (error) {
         say(error.message);
       }
@@ -40,20 +44,15 @@ export default function AddRecipePage() {
   };
 
   return (
-    <section className="panel">
-      <span className="eyebrow">PASS IT AROUND</span>
-      <h2>Share a recipe</h2>
+    <section className={panel}>
+      <span className={eyebrow}>PASS IT AROUND</span>
+      <h2 className={pageTitle}>Share a recipe</h2>
 
-      <p className="muted">
+      <p className={muted}>
         Put each ingredient and each method step on a new line.
       </p>
 
-      <RecipeForm
-        form={form}
-        onChange={setForm}
-        onSubmit={handleSubmit}
-        busy={busy}
-      />
+      <RecipeForm form={form} onChange={setForm} onSubmit={handleSubmit} busy={busy} />
     </section>
   );
 }

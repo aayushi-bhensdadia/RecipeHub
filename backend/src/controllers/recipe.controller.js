@@ -1,7 +1,7 @@
 import { pool } from '../config/db.js';
 import { fail } from '../utils/httpError.js';
 import { slug } from '../utils/text.js';
-import { parseRecipeBody } from '../utils/validators.js';
+import { parseRecipeBody, parseRecipePatch } from '../utils/validators.js';
 
 export async function getRecipe(req, res) {
   const [rows] = await pool.query(
@@ -60,6 +60,39 @@ export async function updateRecipe(req, res) {
     ]
   );
   res.json({ ok: true, dishKey: slug(b.dish) });
+}
+
+// PATCH /api/recipes/:id  -> partial update.
+// Unlike PUT (which replaces the whole recipe), only the fields sent in the
+// request body are changed; everything else stays as it was.
+export async function patchRecipe(req, res) {
+  const [rows] = await pool.query('SELECT * FROM recipes WHERE id=?', [req.params.id]);
+  if (!rows.length) throw fail(404, 'Recipe not found');
+  if (Number(rows[0].uid) !== req.uid) throw fail(403, 'Only the author can edit this recipe');
+
+  const changes = parseRecipePatch(req.body);
+
+  // Build "UPDATE recipes SET col=?, col=? ..." using only the changed fields.
+  const columns = [];
+  const values = [];
+  for (const [column, value] of Object.entries(changes)) {
+    columns.push(`${column}=?`);
+    values.push(column === 'ing' || column === 'steps' ? JSON.stringify(value) : value);
+  }
+
+  // Changing the dish name also changes the dish_key used for grouping.
+  if (changes.dish) {
+    columns.push('dish_key=?');
+    values.push(slug(changes.dish));
+  }
+  // An empty title falls back to the dish name, like when creating a recipe.
+  if ('title' in changes && !changes.title) {
+    const i = columns.indexOf('title=?');
+    values[i] = changes.dish || rows[0].dish;
+  }
+
+  await pool.query(`UPDATE recipes SET ${columns.join(',')} WHERE id=?`, [...values, req.params.id]);
+  res.json({ ok: true, updated: Object.keys(changes), dishKey: slug(changes.dish || rows[0].dish) });
 }
 
 export async function deleteRecipe(req, res) {

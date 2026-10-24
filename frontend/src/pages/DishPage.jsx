@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { getDish } from '../api/dishes.js';
-import BackButton from '../components/BackButton.jsx';
 import RecipeGrid from '../components/RecipeGrid.jsx';
 import { useApp } from '../context/AppContext.jsx';
+import { paths } from '../routes.js';
+import { eyebrow, muted, pageTitle } from '../styles.js';
 
-// Shows every community version of one dish.
+// Shows every community version of one dish.  URL: /dish/:key
 export default function DishPage({ dishKey }) {
-  const { say, withBusy, openRecipe } = useApp();
+  const { say, withBusy } = useApp();
   const [dish, setDish] = useState(null);
 
   useEffect(() => {
@@ -28,15 +29,13 @@ export default function DishPage({ dishKey }) {
 
   return (
     <section>
-      <BackButton label="← Back to explore" />
-
       {dish && (
         <>
-          <span className="eyebrow">COMMUNITY COLLECTION</span>
-          <h2>{dish.name}</h2>
-          <p className="muted">Compare different versions from home cooks.</p>
+          <span className={eyebrow}>COMMUNITY COLLECTION</span>
+          <h2 className={pageTitle}>{dish.name}</h2>
+          <p className={`${muted} mb-5`}>Compare different versions from home cooks.</p>
 
-          <RecipeGrid recipes={dish.versions} onSelect={(recipe) => openRecipe(recipe.id)} />
+          <RecipeGrid recipes={dish.versions} getPath={(recipe) => paths.recipe(recipe.id)} />
         </>
       )}
     </section>

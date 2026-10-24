@@ -27,3 +27,36 @@ export function parseRecipeBody(b) {
     servings: Number(b.servings) || null,
   };
 }
+
+// Validates the body of a PATCH (partial update) request.
+// Only the fields that were sent are checked and returned, as { column: value }.
+export function parseRecipePatch(b = {}) {
+  const changes = {};
+
+  if ('dish' in b) {
+    const dish = String(b.dish || '').trim();
+    if (!dish) throw fail(400, 'Dish name cannot be empty');
+    changes.dish = dish;
+  }
+  if ('title' in b) {
+    changes.title = String(b.title || '').trim();
+  }
+  if ('img' in b) {
+    const img = String(b.img || '');
+    if (img.length > 3e6) throw fail(413, 'Image too large');
+    changes.img = img;
+  }
+  if ('time' in b) changes.time = Number(b.time) || null;
+  if ('servings' in b) changes.servings = Number(b.servings) || null;
+  if ('ing' in b) {
+    changes.ing = lines(b.ing);
+    if (!changes.ing.length) throw fail(400, 'Ingredients cannot be empty');
+  }
+  if ('steps' in b) {
+    changes.steps = lines(b.steps);
+    if (!changes.steps.length) throw fail(400, 'Steps cannot be empty');
+  }
+
+  if (!Object.keys(changes).length) throw fail(400, 'Nothing to update');
+  return changes;
+}

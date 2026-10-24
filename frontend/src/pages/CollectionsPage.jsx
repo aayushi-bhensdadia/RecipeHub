@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { getCollections } from '../api/collections.js';
-import BackButton from '../components/BackButton.jsx';
 import RecipeGrid from '../components/RecipeGrid.jsx';
 import { useApp } from '../context/AppContext.jsx';
+import { pathForRid } from '../routes.js';
+import { muted, pageTitle } from '../styles.js';
 
 export default function CollectionsPage() {
-  const { say, withBusy, openRecipe, openOnlineRecipe } = useApp();
+  const { say, withBusy } = useApp();
   const [items, setItems] = useState([]);
 
   useEffect(() => {
@@ -25,22 +26,14 @@ export default function CollectionsPage() {
     };
   }, [withBusy, say]);
 
-  const handleSelect = (recipe) => {
-    if (recipe.rid?.startsWith('u_')) openRecipe(recipe.rid.slice(2));
-    else if (recipe.rid?.startsWith('s_')) openOnlineRecipe(recipe.rid);
-    else say('Recipe details are unavailable.');
-  };
-
   return (
     <section>
-      <BackButton />
-
-      <h2>Your saved recipes</h2>
+      <h2 className={pageTitle}>Your saved recipes</h2>
 
       {items.length > 0 ? (
-        <RecipeGrid recipes={items} onSelect={handleSelect} />
+        <RecipeGrid recipes={items} getPath={(recipe) => pathForRid(recipe.rid) || '/'} />
       ) : (
-        <p className="muted">
+        <p className={muted}>
           Nothing saved yet. Open a recipe and favourite or bookmark it.
         </p>
       )}
