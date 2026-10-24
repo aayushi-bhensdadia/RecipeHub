@@ -48,30 +48,6 @@ npm run dev
 ```
 Open http://localhost:5000 (the Vite dev server runs on port 5000).
 
-## Page URLs
-| URL | Page | Login needed |
-|---|---|---|
-| `/` | Home (`/?q=pasta` = search) | no |
-| `/login`, `/register` | Login / Register | no |
-| `/dish/:key` | All versions of a dish, e.g. `/dish/paneer%20butter%20masala` | no |
-| `/recipe/:id` | Community recipe | no |
-| `/online/:id` | Online (Spoonacular) recipe | no |
-| `/add` | Share a recipe | yes |
-| `/saved` | Saved recipes | yes |
-| `/my-recipes` | My recipes | yes |
-| `/recipe/:id/edit` | Edit recipe (uses **PATCH**) | yes (author only) |
-
-Unknown URLs show a 404 page. Logged-out visitors opening a login-only URL are sent to `/login` and returned afterwards.
-
-## PATCH method
-`PATCH /api/recipes/:id` updates only the fields sent in the body (PUT replaces the whole recipe).
-The frontend uses it on the Edit page (`EditRecipePage.jsx` -> `patchRecipe()` in `api/recipes.js`).
-
-### Notes
-- Set `SPOONACULAR_KEY` in `backend/.env` to enable external recipe search. Without it, you can still register, log in, and create your own recipes.
-- Do not commit `.env` or share your JWT secret.
-- This is a development starter; add production hardening, rate limiting, and stronger image storage before deployment.
-
 ## Project structure
 
 ```
